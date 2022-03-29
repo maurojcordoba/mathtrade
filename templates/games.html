@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %} {{ title }} {% endblock %}
+
+
+{% block content %}
+
+
+<div>
+  <div class="row">
+    <h3>
+      <a href="{{  url_template.format(data[0][7]) }}" target="_blank" role="button">{{ data[0][2]}}</a>
+    </h3>
+  </div>
+</div>
+
+<div>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data %}
+        <tr>
+          <td class="col-sm-2 align-top">
+            <img src="{{ item[8] }}" alt="..." class="img-fluid img-responsive rounded product-image">
+            <p><strong>Id:</strong> <a href="{{  url_template.format(item[10]) }}" target="_blank" role="button">{{ item[0] }}</a></p>
+            <p><strong>Username:</strong> {{ item[5] }}</p>
+            <p><strong>Ranking:</strong> {{ item[3] }}</p>
+            <p><strong>Rating:</strong> {{ item[4] }}</p>
+          </td>
+          <td>
+            {% autoescape false %}
+            {{ item[6].decode('utf-8') }}
+            {% endautoescape %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+{% endblock %}
