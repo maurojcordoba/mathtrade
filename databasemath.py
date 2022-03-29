@@ -60,14 +60,6 @@ class DataBaseMath:
             return items
         except Exception as e:
             raise
-    def get_last(self):
-        sql = 'SELECT max(id) last FROM games'
-        try:
-            self.cursor.execute(sql);            
-            return self.cursor.fetchone()[0]
-
-        except Exception as e:
-            raise
 
     def close(self):
         self.cursor.close()
