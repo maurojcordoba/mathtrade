@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import re
 import requests
 
-from databasemath import DataBaseMath
+from database import DataBase
 
 def get_url(page):
     """genera url"""     
@@ -10,71 +10,81 @@ def get_url(page):
 
 #def main():
 # conexion a base
-database = DataBaseMath()
+database = DataBase()
 
 # vacio tabla games
-database.delete_games()
+#database.delete_games()
 
-for page in range(1,49):
-    print('Page: ', page)
+# ultima pagina
+web = requests.get(get_url(1))
+soup = BeautifulSoup(web.content, 'html.parser', multi_valued_attributes=None)
+last_page = soup.find('a', attrs={'title':'last page'}).text
+m = re.search('\[(.\d+)\]', last_page)
+last_page = int(m.group(1))
 
-    url = get_url(page)
-    web = requests.get(url)
-    soup = BeautifulSoup(web.content, 'html.parser', multi_valued_attributes=None)
+if last_page > 0:
+    for page in range(1,last_page+1):
+        print('Page: ', page)
 
-    items = soup.find_all('div', attrs={'class':re.compile('^js-rollable article')})
+        url = get_url(page)
+        web = requests.get(url)
+        soup = BeautifulSoup(web.content, 'html.parser', multi_valued_attributes=None)
 
-    for item in items:
+        items = soup.find_all('div', attrs={'class':re.compile('^js-rollable article')})
 
-        temp = item.find('div', class_='fl')
+        for item in items:
 
-        # url_geeklist
-        url_geeklist = temp.a['href']
+            temp = item.find('div', class_='fl')
 
-        # url
-        url = item.a.next_sibling.next_sibling['href']
-        # name
-        name = temp.a.next_sibling.next_sibling.text
-        # type
-        type = temp.text
-        type = type[type.find('.')+1:type.find(':')].strip()
-        # id
-        id = int(temp.a.text.replace('.',''))
-        
-        temp2 = item.find('span', class_='sf')
+            # url_geeklist
+            url_geeklist = temp.a['href']
 
-        # rating
-        rating = temp2.text
-        m = re.search('Rating.(.+?)[Overall|Unranked]', rating)
-        rating = float(m.group(1).strip())
-        
-        # rank
-        try:
-            rank = temp2.a.text            
-        except AttributeError:
-            print('Rank-AttributeError: ', id)
-            rank = 0  
-        rank = int(rank)
+            # url
+            url = item.a.next_sibling.next_sibling['href']
+            # name
+            name = temp.a.next_sibling.next_sibling.text
+            # type
+            type = temp.text
+            type = type[type.find('.')+1:type.find(':')].strip()
+            # id
+            id = int(temp.a.text.replace('.',''))
+            
+            temp2 = item.find('span', class_='sf')
 
-        # username
-        username = item.find('div', class_='username').text
-        username = username[1:username.find(')')]
+            # rating
+            rating = temp2.text
+            m = re.search('Rating.(.+?)[Overall|Unranked]', rating)
+            rating = float(m.group(1).strip())
+            
+            # rank
+            try:
+                rank = temp2.a.text            
+            except AttributeError:
+                #print('Rank-AttributeError: ', id)
+                rank = 0  
+            rank = int(rank)
 
-        # description
-        dd = item.find('dd', class_='doubleright')
-        description = dd.encode(formatter="html5").strip()
+            # username
+            username = item.find('div', class_='username').text
+            username = username[1:username.find(')')]
 
-        #url_image
-        url_image = item.find('dd', class_='doubleleft').img['src']
+            # description
+            dd = item.find('dd', class_='doubleright')
+            description = dd.encode(formatter="html5").strip()
 
-        # bbgid
-        m = re.search('\/.*\/(.*?)\/', url)
-        
-        bggid = int(m.group(1).strip())
+            #url_image
+            url_image = item.find('dd', class_='doubleleft').img['src']
 
-        game = (id,type,name,rank,rating,username,description,url,url_image,bggid,url_geeklist)
-        
-        database.insert_game(game)
+            # bbgid
+            m = re.search('\/.*\/(.*?)\/', url)
+            
+            bggid = int(m.group(1).strip())
+
+            game = (id,type,name,rank,rating,username,description,url,url_image,bggid,url_geeklist)
+            
+            #database.insert_game(game)
+    
+    database.insert_update()
 
 database.close()
 

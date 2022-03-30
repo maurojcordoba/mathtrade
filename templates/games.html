@@ -9,7 +9,7 @@
 <div>
   <div class="row">
     <h3>
-      <a href="{{  url_template.format(data[0][7]) }}" target="_blank" role="button">{{ data[0][2]}}</a>
+      
     </h3>
   </div>
 </div>
@@ -25,15 +25,15 @@
         {% for item in data %}
         <tr>
           <td class="col-sm-2 align-top">
-            <img src="{{ item[8] }}" alt="..." class="img-fluid img-responsive rounded product-image">
-            <p><strong>Id:</strong> <a href="{{  url_template.format(item[10]) }}" target="_blank" role="button">{{ item[0] }}</a></p>
-            <p><strong>Username:</strong> {{ item[5] }}</p>
-            <p><strong>Ranking:</strong> {{ item[3] }}</p>
-            <p><strong>Rating:</strong> {{ item[4] }}</p>
+            <img src="{{ item['url_image'] }}" alt="..." class="img-fluid img-responsive rounded product-image">
+            <p><strong>Id:</strong> <a href="{{  url_template.format(item['url_geeklist']) }}" target="_blank" role="button">{{ item['id'] }}</a></p>
+            <p><strong>Username:</strong> {{ item['username'] }}</p>
+            <p><strong>Ranking:</strong> {{ item['rank'] }}</p>
+            <p><strong>Rating:</strong> {{ item['rating'] }}</p>
           </td>
           <td>
             {% autoescape false %}
-            {{ item[6].decode('utf-8') }}
+            {{ item['description']}}
             {% endautoescape %}
           </td>
         </tr>
